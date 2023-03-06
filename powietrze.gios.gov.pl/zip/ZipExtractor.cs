@@ -34,7 +34,7 @@ public class ZipExtractor
     {
         return Task.Run(() =>
         {
-            string extractPath = $"{Directory.GetParent(file).Parent.FullName}\\extracted_files\\{Path.GetFileNameWithoutExtension(file)}";
+            string extractPath = $"{Directory.GetParent(file).Parent.FullName}/extracted_files/{Path.GetFileNameWithoutExtension(file)}";
 
             Console.WriteLine($"Extracting {Path.GetFileName(file)}");
             EnsureDirectoryExistsAndItsClean(extractPath);

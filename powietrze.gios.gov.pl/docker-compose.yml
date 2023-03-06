@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  net:
+    image: mcr.microsoft.com/dotnet/sdk:7.0
+    volumes: 
+      - ./:/src
+    working_dir: /src
+    entrypoint: dotnet run .
+    # tty: true
