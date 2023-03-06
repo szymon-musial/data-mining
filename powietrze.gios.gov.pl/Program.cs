@@ -2,8 +2,11 @@
 using powietrze.gios.gov.pl.zip;
 
 
-var downloader = new Downloader(UrlArray.Urls, Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\downloaded_zip");
+Downloader downloader = new (UrlArray.Urls, Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\downloaded_zip");
 var tasks = downloader.GenerateDownloadTasks();
 await Task.WhenAll(tasks.ToArray());
-Console.WriteLine("Downloaded");
 
+
+ZipExtractor zipExtractor = new(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\downloaded_zip");
+await Task.WhenAll(zipExtractor.ExtractFilesAsync().ToArray());
+Console.WriteLine("Extracted");
