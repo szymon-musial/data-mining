@@ -177,8 +177,14 @@ public class XlsxExctractor
                 lock (_appDbContext)
                 {
                     ProcessedFiles++;
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Uploading {ProcessedFiles}/{filesCount}");
+                    Console.ResetColor();
+
                     _appDbContext.AddRange(enitiesToAdd);
                     int updateCount = _appDbContext.SaveChanges();
+
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"Finished {ProcessedFiles}/{filesCount}. Added {updateCount} rows");
                     Console.ResetColor();
