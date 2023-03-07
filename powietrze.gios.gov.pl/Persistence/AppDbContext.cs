@@ -12,9 +12,8 @@ public class AppDbContext : DbContext
         var DbHost = "localhost";
         var DbUserName = "postgres";
         var DbPassword = "root";
-        var DbDatabase = "DataMining";
 
-        var defaultPgConnectionString = $"Host={DbHost};Database={DbDatabase};Username={DbUserName};Password={DbPassword}";
+        var defaultPgConnectionString = $"Host={DbHost};Database=DataMining;Username={DbUserName};Password={DbPassword}";
         optionsBuilder.UseNpgsql(defaultPgConnectionString);
         base.OnConfiguring(optionsBuilder);
     }
