@@ -1,6 +1,7 @@
 ﻿using IronXL;
 using powietrze.gios.gov.pl.Entities;
 using powietrze.gios.gov.pl.Persistence;
+using powietrze.gios.gov.pl.zip;
 using System.Data;
 
 namespace powietrze.gios.gov.pl.xlsxExtractor;
@@ -12,12 +13,6 @@ public class XlsxExctractor
 
     int MaxColumnToSearch = 10;
     int ColumnDescriptionIndex = 0;
-
-
-    List<string> _stationNames = new List<string>()
-        {
-            "DsJelw05"
-        };
 
     public XlsxExctractor(string destinationFolder, AppDbContext appDbContext)
     {
@@ -117,6 +112,12 @@ public class XlsxExctractor
         }
     }
 
+    public IDictionary<int, string> FilterStationNames(IDictionary<int, string> stationNames)
+        =>  stationNames.Where(s =>
+                UsedStations.ExactStationName.Contains(s.Value) ||
+                UsedStations.ContainsStationName.Any(pattern => s.Value.Contains(pattern))
+            ).ToDictionary(i => i.Key, i => i.Value);
+
     public void DbSeed(int maxRunningTasks = int.MaxValue)
     {
         string extractPath = Path.Combine(_destinationFolder, "extracted_files");
@@ -167,9 +168,11 @@ public class XlsxExctractor
 
                 var allStations = GetStationNames(table, stationCodeRowIndex.Value);
 
+                var useStationNames = FilterStationNames(allStations);
+
                 var enitiesToAdd = new List<SheetEntity>();
 
-                foreach (var station in allStations)
+                foreach (var station in useStationNames)
                 {
                     enitiesToAdd.AddRange(InsertDataForStation(table, station, stationCodeRowIndex.Value, pollutantCodeRowIndex.Value, measurementStartingRowIndex.Value));
                 }
