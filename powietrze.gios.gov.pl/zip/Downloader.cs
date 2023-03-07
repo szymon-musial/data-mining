@@ -24,7 +24,8 @@ public class Downloader
 
     public static Task DownloadZipTask(string url, string destinationFolder, int year)
     {
-        var destinationFileLocation = $"{destinationFolder}/{year}.zip";
+        var destinationFileLocation = Path.Combine(destinationFolder, $"{year}.zip");
+
         using (var client = new WebClient())
         {
             int lastPercentage = 0;
