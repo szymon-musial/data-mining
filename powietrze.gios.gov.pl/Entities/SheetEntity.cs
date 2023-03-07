@@ -11,4 +11,6 @@ public class SheetEntity
     public string StationName { get; set; }
     public double? Value { get; set; }
 
+    public DateTime Date { get; set; }
+
 }

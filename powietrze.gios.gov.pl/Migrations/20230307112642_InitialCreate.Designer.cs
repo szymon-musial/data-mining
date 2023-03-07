@@ -12,7 +12,7 @@ using powietrze.gios.gov.pl.Persistence;
 namespace powietrze.gios.gov.pl.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230307101618_InitialCreate")]
+    [Migration("20230307112642_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,13 +25,16 @@ namespace powietrze.gios.gov.pl.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("powietrze.gios.gov.pl.Entity.sheetEntity", b =>
+            modelBuilder.Entity("powietrze.gios.gov.pl.Entities.SheetEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PollutantName")
                         .IsRequired()

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -19,7 +20,8 @@ namespace powietrze.gios.gov.pl.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PollutantName = table.Column<string>(type: "text", nullable: false),
                     StationName = table.Column<string>(type: "text", nullable: false),
-                    Value = table.Column<double>(type: "double precision", nullable: true)
+                    Value = table.Column<double>(type: "double precision", nullable: true),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

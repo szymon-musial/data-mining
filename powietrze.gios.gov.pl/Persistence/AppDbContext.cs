@@ -9,7 +9,12 @@ public class AppDbContext : DbContext
 {
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var defaultPgConnectionString = "Host=localhost;Database=DataMining;Username=postgres;Password=root";
+        var DbHost = "localhost";
+        var DbUserName = "postgres";
+        var DbPassword = "root";
+        var DbDatabase = "DataMining";
+
+        var defaultPgConnectionString = $"Host={DbHost};Database={DbDatabase};Username={DbUserName};Password={DbPassword}";
         optionsBuilder.UseNpgsql(defaultPgConnectionString);
         base.OnConfiguring(optionsBuilder);
     }

@@ -22,13 +22,16 @@ namespace powietrze.gios.gov.pl.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("powietrze.gios.gov.pl.Entity.sheetEntity", b =>
+            modelBuilder.Entity("powietrze.gios.gov.pl.Entities.SheetEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PollutantName")
                         .IsRequired()
