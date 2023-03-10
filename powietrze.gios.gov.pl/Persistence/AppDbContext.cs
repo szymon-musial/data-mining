@@ -15,4 +15,5 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<SheetEntity> SheetEntities { get; set; }
+    public DbSet<StationInFileEntity> StationInFileEntities { get; set;}
 }

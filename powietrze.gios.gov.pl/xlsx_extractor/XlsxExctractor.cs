@@ -168,6 +168,8 @@ public class XlsxExctractor
 
                 var allStations = GetStationNames(table, stationCodeRowIndex.Value);
 
+                SaveStations(fileName, allStations);
+
                 var useStationNames = FilterStationNames(allStations);
 
                 var enitiesToAdd = new List<SheetEntity>();
@@ -208,17 +210,20 @@ public class XlsxExctractor
             }
         });
     }
-}
 
-
-public static class ListExtensions
-{
-    public static List<List<T>> ChunkBy<T>(this List<T> source, int chunkSize)
+    public void SaveStations(string workBook, IDictionary<int, string> stations)
     {
-        return source
-            .Select((x, i) => new { Index = i, Value = x })
-            .GroupBy(x => x.Index / chunkSize)
-            .Select(x => x.Select(v => v.Value).ToList())
-            .ToList();
+        string workBookWithoutYear = Path.GetFileNameWithoutExtension(workBook).Remove(0, 5);
+
+        lock (_appDbContext)
+        {
+            _appDbContext.StationInFileEntities.AddRange(stations.Values.Select(i => new StationInFileEntity
+            {
+                FullSheetName = workBook,
+                SheetName = workBookWithoutYear,
+                StationName = i,
+            }));
+        }
     }
+
 }
