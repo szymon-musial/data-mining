@@ -22,9 +22,9 @@ var tasks = downloader.GenerateDownloadTasks();
 await Task.WhenAll(tasks.ToArray());
 
 
-//ZipExtractor zipExtractor = new(workingFolder + "/downloaded_zip");
-//await Task.WhenAll(zipExtractor.ExtractFilesAsync().ToArray());
-//Console.WriteLine("Extracted");
+ZipExtractor zipExtractor = new(workingFolder + "/downloaded_zip");
+await Task.WhenAll(zipExtractor.ExtractFilesAsync().ToArray());
+Console.WriteLine("Extracted");
 
 var appDbContext = new AppDbContext();
 
