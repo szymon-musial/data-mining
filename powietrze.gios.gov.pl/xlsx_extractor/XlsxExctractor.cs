@@ -165,7 +165,8 @@ public class XlsxExctractor
         string extractPath = Path.Combine(_destinationFolder, "extracted_files");
         var allWorkbooks = Directory.GetDirectories(extractPath).SelectMany(Directory.GetFiles);
 
-        var tasks = CreateProcessingTasks(allWorkbooks);
+        var filterredWorkbooks = allWorkbooks.Where(b => !b.Contains("epozycja"));
+        var tasks = CreateProcessingTasks(filterredWorkbooks);
 
         Parallel.ForEach(tasks, new ParallelOptions { MaxDegreeOfParallelism = maxRunningTasks }, a => a.Wait());
     }
@@ -213,9 +214,10 @@ public class XlsxExctractor
 
                 var allStations = GetStationNames(table, stationCodeRowIndex.Value);
 
-                SaveStations(fileName, allStations);
-
                 var useStationNames = FilterStationNames(allStations);
+
+                SaveStations(fileName, allStations, useStationNames);
+
 
                 var enitiesToAdd = new List<SheetEntity>();
 
@@ -245,28 +247,42 @@ public class XlsxExctractor
                 workBook.Close();
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 ErrorFilesCount++;
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"An error ocured whan process {fileName}");
+                Console.WriteLine(e);
                 Console.WriteLine($"Failed files count {ErrorFilesCount}/{filesCount}");
                 Console.ResetColor();
             }
         });
     }
 
-    public void SaveStations(string workBook, IDictionary<int, string> stations)
+    public void SaveStations(string workBook, IDictionary<int, string> allStations, IDictionary<int, string> usedStations)
     {
         string workBookWithoutYear = Path.GetFileNameWithoutExtension(workBook).Remove(0, 5);
 
+        var usedStationsList = usedStations.Select(i => i.Value);
+        var allStationsList = allStations.Select(i => i.Value);
+        var notUsedStationList = allStationsList.Except(usedStationsList);
+
         lock (_appDbContext)
         {
-            _appDbContext.StationInFileEntities.AddRange(stations.Values.Select(i => new StationInFileEntity
+            _appDbContext.StationInFileEntities.AddRange(usedStationsList.Select(i => new StationInFileEntity
             {
                 FullSheetName = workBook,
                 SheetName = workBookWithoutYear,
                 StationName = i,
+                Used = true
+            }));
+
+            _appDbContext.StationInFileEntities.AddRange(notUsedStationList.Select(i => new StationInFileEntity
+            {
+                FullSheetName = workBook,
+                SheetName = workBookWithoutYear,
+                StationName = i,
+                Used = false
             }));
         }
     }

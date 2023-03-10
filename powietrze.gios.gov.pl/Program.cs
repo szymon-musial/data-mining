@@ -8,13 +8,17 @@ var builder = new ConfigurationBuilder().AddUserSecrets<Program>();
 var configurationRoot = builder.Build();
 
 var connectionString = configurationRoot.GetSection("connectionString").Value;
-if(connectionString is not null )
+if (connectionString is null)
+{
+    connectionString = Environment.GetEnvironmentVariable("connectionString");
+}
+
+if (connectionString is not null )
 {
     AppDbContext.connectionString = connectionString;
 }
 
-
-var workingFolder = args.Length == 1 ? args[0] : Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+var workingFolder = Environment.GetEnvironmentVariable("workingFolder") ?? Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
 Console.WriteLine($"Working directory: {workingFolder}");
 
 Downloader downloader = new (UrlArray.Urls, workingFolder + "/downloaded_zip");

@@ -9,5 +9,5 @@ public class StationInFileEntity
     public string StationName { get; set; }
     public string SheetName { get; set; }
     public string FullSheetName { get; set; }
-
+    public bool Used { get; set; }
 }

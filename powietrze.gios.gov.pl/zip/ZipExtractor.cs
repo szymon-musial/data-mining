@@ -26,11 +26,6 @@ public class ZipExtractor
         var filesInDirectory = Directory.GetFiles(_destinationFolder);
         foreach(var file in filesInDirectory)
         {
-            if(Path.GetFileName(file).Contains("Depozycja"))
-            {
-                yield break;
-            }
-
             yield return ExtractorTask(file);
         }
     }
