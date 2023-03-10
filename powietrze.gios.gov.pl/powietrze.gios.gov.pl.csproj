@@ -6,7 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<ServerGarbageCollection>true</ServerGarbageCollection>
-	<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>	  
+	<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+	<UserSecretsId>8fb17ef5-cd2b-4e3e-beca-99d37495a75d</UserSecretsId>	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
   </ItemGroup>
 

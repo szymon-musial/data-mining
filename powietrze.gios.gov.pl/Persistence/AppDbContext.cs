@@ -7,14 +7,10 @@ namespace powietrze.gios.gov.pl.Persistence;
 
 public class AppDbContext : DbContext
 {
+    public static string connectionString = "Host=localhost;Database=DataMining;Username=postgres;Password=root";
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var DbHost = "localhost";
-        var DbUserName = "postgres";
-        var DbPassword = "root";
-
-        var defaultPgConnectionString = $"Host={DbHost};Database=DataMining;Username={DbUserName};Password={DbPassword}";
-        optionsBuilder.UseNpgsql(defaultPgConnectionString);
+        optionsBuilder.UseNpgsql(connectionString);
         base.OnConfiguring(optionsBuilder);
     }
 
