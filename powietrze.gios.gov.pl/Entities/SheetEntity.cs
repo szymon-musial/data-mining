@@ -13,4 +13,6 @@ public class SheetEntity
 
     public DateTime Date { get; set; }
 
+    public int TimeRange { get; set; }
+    public string FullSheetName { get; set; }
 }

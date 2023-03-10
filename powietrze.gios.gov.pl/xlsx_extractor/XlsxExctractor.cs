@@ -40,6 +40,33 @@ public class XlsxExctractor
     public int? GetStationCodeRowIndex(DataTable table) => SearchRowsInColumnForValue(table, "Kod stacji");
     public int? GetPollutantNameRowIndex(DataTable table) => SearchRowsInColumnForValue(table, "Wskaźnik");
 
+    /// <summary>
+    /// 2016 and few in 2018 year are diferrent
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    public int? GetStationCodeRowIndex2ndTry(DataTable table)
+    {
+        for (int rowIndex = 0; rowIndex < MaxColumnToSearch; rowIndex++)
+        {
+            var cellInFirstColumn = table.Rows[rowIndex][ColumnDescriptionIndex+1];
+            if (cellInFirstColumn is string cellInFirstColumnString)
+            {
+                // guess only its station name
+                if (cellInFirstColumnString.Length > 3)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine($"Assume it's station name {cellInFirstColumnString}");                    
+                    Console.ResetColor();
+                    return rowIndex;
+                }
+            }
+
+        }
+        return null;
+    }
+
+
     public IDictionary<int, string> GetStationNames(DataTable table, int stationCodeRowIndex)
     {
         var stationDictionary = new Dictionary<int, string>();
@@ -73,7 +100,7 @@ public class XlsxExctractor
         DataTable table,
         KeyValuePair<int, string> keyValuePair,
         int stationCodeRowIndex,
-        int pollutantCodeRowIndex,
+        string workbookFullName,
         int measurementStartingRowIndex)
     {
         var stationColumn = keyValuePair.Key;
@@ -81,13 +108,26 @@ public class XlsxExctractor
 
         var rowCount = table.Columns[keyValuePair.Key].Table.Rows.Count;
 
-        var pollutionName = (string)table.Rows[pollutantCodeRowIndex][stationColumn];
+        var shortFileName = Path.GetFileNameWithoutExtension(workbookFullName).Trim();
+        var splitedFileName = shortFileName.Split('_');
+
+        var pollutionName = splitedFileName[1];
+        var timeRange = int.Parse(splitedFileName[2].Remove(splitedFileName[2].Length - 1));
 
 
         for (int currentRow = measurementStartingRowIndex; currentRow < rowCount; currentRow++)
         {
+            // case 2014_C6H6_1g.xlsx
+            // user create table so (index < rowCount) can be null
+
+
             // DataTime UTC must have when works with Pg
-            var dateTime = DateTime.SpecifyKind((DateTime)table.Rows[currentRow][ColumnDescriptionIndex], DateTimeKind.Utc);
+            var rawDataTime = table.Rows[currentRow][ColumnDescriptionIndex];
+            if(rawDataTime is DBNull)
+            {
+                continue;
+            }
+            var dateTime = DateTime.SpecifyKind((DateTime)rawDataTime, DateTimeKind.Utc);
 
             double? castedValue = null;
 
@@ -104,10 +144,12 @@ public class XlsxExctractor
 
             yield return new SheetEntity()
             {
-                PollutantName = pollutionName,
+                PollutantName = pollutionName,                
                 StationName = stationName,
                 Value = castedValue,
                 Date = dateTime,
+                FullSheetName = workbookFullName,
+                TimeRange = timeRange,
             };
         }
     }
@@ -161,9 +203,12 @@ public class XlsxExctractor
 
                 Console.WriteLine($"Processing {OpenedFiles}/{filesCount} file: {fileName}");
 
+                var stationCodeRowIndex = GetStationCodeRowIndex(table);
+                if(stationCodeRowIndex is null )
+                {
+                    stationCodeRowIndex = GetStationCodeRowIndex2ndTry(table);
+                }
 
-                var stationCodeRowIndex = GetStationCodeRowIndex(table)!;
-                var pollutantCodeRowIndex = GetPollutantNameRowIndex(table)!;
                 var measurementStartingRowIndex = GetMeasurementFirstRowIndex(table)!;
 
                 var allStations = GetStationNames(table, stationCodeRowIndex.Value);
@@ -176,7 +221,7 @@ public class XlsxExctractor
 
                 foreach (var station in useStationNames)
                 {
-                    enitiesToAdd.AddRange(InsertDataForStation(table, station, stationCodeRowIndex.Value, pollutantCodeRowIndex.Value, measurementStartingRowIndex.Value));
+                    enitiesToAdd.AddRange(InsertDataForStation(table, station, stationCodeRowIndex.Value, fileName, measurementStartingRowIndex.Value));
                 }
 
                 lock (_appDbContext)
