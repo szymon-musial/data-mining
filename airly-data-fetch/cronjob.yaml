@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: airly-data-fetch
+spec:
+  schedule: "0 9,21 * * *"
+  jobTemplate:
+    spec:
+      template:        
+        spec:
+          volumes:
+          - name: crypto-config
+            hostPath:
+              path: /home/ubuntu/data-mining/airly-data-fetch
+          containers:
+          - name: hello
+            image: mcr.microsoft.com/dotnet/sdk:7.0
+            envFrom:
+               - secretRef:
+                  name: airly-data-fetch-env
+            volumeMounts:
+              - name: crypto-config
+                mountPath: /src
+            imagePullPolicy: IfNotPresent
+            command:
+              - /bin/sh
+              - -c 
+              - cd /src ; dotnet run
+          restartPolicy: OnFailure
+
+# kubectl create secret generic airly-data-fetch-env --from-literal=apiKey=333333 --from-literal=connectionString='Host=localhost;Database=postgres;Username=postgres;Password=root'

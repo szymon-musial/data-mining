@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rapidapi-wettercom
+spec:
+  schedule: "0 9,21 * * *"
+  jobTemplate:
+    spec:
+      template:        
+        spec:
+          volumes:
+          - name: crypto-config
+            hostPath:
+              path: /home/ubuntu/data-mining/rapidapi-wettercom
+          containers:
+          - name: hello
+            image: mcr.microsoft.com/dotnet/sdk:7.0
+            envFrom:
+               - secretRef:
+                  name: rapidapi-wettercom-env
+            volumeMounts:
+              - name: crypto-config
+                mountPath: /src
+            imagePullPolicy: IfNotPresent
+            command:
+              - /bin/sh
+              - -c 
+              - cd /src ; dotnet run
+          restartPolicy: OnFailure
+
+# kubectl create secret generic rapidapi-wettercom-env --from-literal=RapidApiKey=333333 --from-literal=connectionString='Host=localhost;Database=postgres;Username=postgres;Password=root'
